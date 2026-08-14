@@ -298,7 +298,16 @@ def restore_three_engine_separators(
         )
         verifier_marks = _separator_marks(verifier_separator)
         secondary_marks = _separator_marks(secondary_separator)
-        if verifier_marks and verifier_marks == secondary_marks:
+        prev_is_number = bool(
+            index > 0
+            and index <= len(primary_tokens)
+            and any(character.isdigit() for character in primary_tokens[index - 1].text)
+        )
+        if (
+            verifier_marks
+            and verifier_marks == secondary_marks
+            and (_separator_marks(primary_separator) or prev_is_number)
+        ):
             selected.append(verifier_separator)
         else:
             selected.append(primary_separator)
@@ -365,6 +374,22 @@ def normalize_legal_collocations(value: str) -> str:
         r"(?<=sự tham gia của các )tố\b",
         "tổ",
     )
+    # Các quy tắc sửa lỗi pháp lý từ đối chiếu thực tế
+    normalized = _replace_with_case(normalized, r"\btỉnh thần\b", "tinh thần")
+    normalized = _replace_with_case(normalized, r"\bchỉ phí\b", "chi phí")
+    normalized = _replace_with_case(normalized, r"\bkinh tế tự nhân\b", "kinh tế tư nhân")
+    normalized = _replace_with_case(normalized, r"\bbất khả khảng\b", "bất khả kháng")
+    normalized = _replace_with_case(normalized, r"\bkiếm soát\b", "kiểm soát")
+    normalized = _replace_with_case(normalized, r"\btrí tuệ nhiệu nhân tạo\b", "trí tuệ nhân tạo")
+    normalized = _replace_with_case(normalized, r"\bxỏ(?=\s+các rào cản\b)", "xoá bỏ")
+    normalized = _replace_with_case(normalized, r"\bhỗ tượ\b", "hỗ trợ")
+    normalized = _replace_with_case(normalized, r"\bhỗ tạợ\b", "hỗ trợ")
+    normalized = _replace_with_case(normalized, r"\bChp nhật\b", "Cập nhật")
+    normalized = _replace_with_case(normalized, r"(?<=giảm nghèo,\s*)nghiệm định\b", "ổn định")
+    normalized = _replace_with_case(normalized, r"\bSửa di(?=\s+Luật\b)", "Sửa đổi")
+    normalized = _replace_with_case(normalized, r"\bmi quan hệ\b", "mối quan hệ")
+    normalized = _replace_with_case(normalized, r"\btrình đũ\b", "trình độ")
+    normalized = _replace_with_case(normalized, r"\bdẫn đình trạng\b", "dẫn đến tình trạng")
     return normalized
 
 
@@ -420,6 +445,7 @@ def _fuse_consensus_tokens(
                 and candidate_strict == verifier_strict
                 and _diacritic_count(candidate_token.text)
                 > _diacritic_count(primary_token.text)
+                and primary_token.text.casefold() not in {"tinh", "chi"}
             ):
                 replacement = verifier_token.text
             elif (
@@ -431,7 +457,7 @@ def _fuse_consensus_tokens(
             else:
                 replacement = primary_token.text
         elif verifier_token is not None and verifier_token.key == candidate_token.key:
-            if _diacritic_count(verifier_token.text) > _diacritic_count(candidate_token.text):
+            if _diacritic_count(verifier_token.text) > _diacritic_count(candidate_token.text) and candidate_token.text.casefold() not in {"tinh", "chi"}:
                 replacement = verifier_token.text
         if replacement != candidate_token.text:
             replacements.append((candidate_token.start, candidate_token.end, replacement))
@@ -462,6 +488,7 @@ def _replace_primary_token_surfaces(
             != unicodedata.normalize("NFC", verifier_token.text)
             and _diacritic_count(verifier_token.text)
             > _diacritic_count(primary_token.text)
+            and primary_token.text.casefold() not in {"tinh", "chi"}
         )
     ]
     result = primary
@@ -517,6 +544,7 @@ def choose_verifier_consensus(
     )
     verifier_adds_diacritic_evidence = diacritic_only and any(
         _diacritic_count(verifier.text) > _diacritic_count(primary.text)
+        and primary.text.casefold() not in {"tinh", "chi"}
         for primary, verifier in zip(primary_tokens, verifier_tokens, strict=True)
     )
     if diacritic_only and (

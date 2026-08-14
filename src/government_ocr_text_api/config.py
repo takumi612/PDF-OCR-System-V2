@@ -225,7 +225,7 @@ class Settings(BaseSettings):
     # Tesseract chạy trên crop riêng với PSM 7; chỉ đồng thuận ba engine mới
     # được phép thay text, vì vậy cơ chế này không biến PARTIAL thành kết quả
     # "đẹp giả" bằng suy đoán từ điển.
-    partial_remediation_enabled: bool = True
+    partial_remediation_enabled: bool = False
     partial_remediation_max_lines_per_page: int = Field(default=8, ge=0, le=32)
     partial_remediation_tesseract_psm: int = Field(default=7, ge=1, le=13)
 
