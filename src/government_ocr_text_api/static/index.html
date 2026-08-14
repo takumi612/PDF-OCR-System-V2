@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Government OCR Text API</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>PDF → Văn bản</h1>
+      <p>So sánh PDF gốc và nội dung bóc tách, không sinh bounding box.</p>
+    </div>
+    <a href="/docs" target="_blank" rel="noreferrer">Swagger API</a>
+  </header>
+
+  <main>
+    <section class="upload-panel">
+      <label class="file-picker">
+        <span>Chọn PDF</span>
+        <input id="pdfFile" type="file" accept="application/pdf,.pdf">
+      </label>
+      <button id="extractButton" type="button" disabled>Bóc tách văn bản</button>
+      <button id="downloadButton" type="button" disabled>Tải TXT gốc</button>
+      <button id="aiSafeDownloadButton" type="button" disabled>Tải TXT an toàn AI</button>
+      <button id="auditDownloadButton" type="button" disabled>Tải audit JSON</button>
+      <span id="status" role="status" aria-live="polite">Chưa chọn tệp.</span>
+    </section>
+
+    <section class="summary" id="summary" hidden>
+      <span id="pageCount"></span>
+      <span id="nativeCount"></span>
+      <span id="ocrCount"></span>
+      <span id="riskCount"></span>
+      <span id="aiReady"></span>
+      <span id="elapsed"></span>
+    </section>
+
+    <section class="risk-review" id="riskReview" hidden>
+      <div class="risk-heading">
+        <div>
+          <h2>Các dòng cần đối chiếu với PDF</h2>
+          <p id="riskMessage"></p>
+        </div>
+      </div>
+      <div id="riskList" class="risk-list"></div>
+    </section>
+
+    <section class="comparison">
+      <article class="pane">
+        <h2>PDF gốc</h2>
+        <iframe id="pdfViewer" title="PDF gốc"></iframe>
+      </article>
+      <article class="pane text-pane">
+        <div class="pane-heading">
+          <h2>Văn bản bóc tách</h2>
+          <div class="tabs" role="tablist">
+            <button class="tab active" data-format="text" type="button">Text</button>
+            <button class="tab" data-format="markdown" type="button">Markdown</button>
+            <button class="tab" data-format="ai_safe_text" type="button">AI-safe</button>
+          </div>
+        </div>
+        <textarea id="resultText" readonly placeholder="Kết quả sẽ hiển thị tại đây"></textarea>
+      </article>
+    </section>
+  </main>
+  <script src="/static/app.js" defer></script>
+</body>
+</html>
