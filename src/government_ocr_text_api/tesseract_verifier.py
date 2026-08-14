@@ -337,9 +337,6 @@ class TesseractPageVerifier:
             "failed_count": 0,
             "events": [],
         }
-        if not self.settings.partial_remediation_enabled:
-            metrics.update(status="disabled", elapsed_ms=0.0)
-            return [None] * len(crops), metrics
         if not self._runtime_available():
             metrics.update(
                 status="unavailable",
