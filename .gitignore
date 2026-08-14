@@ -5,4 +5,14 @@ __pycache__/
 .ruff_cache/
 .env
 runtime/
+logs/
+*.log
+*.zip
 models/vietocr/*.pth
+
+# Ignored as requested: docs, tests, internal audit/patch files
+docs/
+tests/
+PATCH-*.md
+CORPUS_COUPLING_AUDIT.md
+
