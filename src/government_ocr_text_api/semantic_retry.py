@@ -374,12 +374,6 @@ def normalize_legal_collocations(value: str) -> str:
         r"(?<=sự tham gia của các )tố\b",
         "tổ",
     )
-    # Phục hồi lỗi biến dạng do ô tick / Checkbox glyph ở đầu dòng
-    normalized = _replace_with_case(normalized, r"^D\s*cị\s*hị\s*ch\s*vụ\b", "Dịch vụ")
-    normalized = _replace_with_case(normalized, r"^D\s*cị\s*vụ\b", "Dịch vụ")
-    normalized = _replace_with_case(normalized, r"^00\s+tô\b", "Ô tô")
-    normalized = _replace_with_case(normalized, r"^B\s+tất\s+động\s+sản\b", "Bất động sản")
-    normalized = _replace_with_case(normalized, r"^Hong\s+hóa\b", "Hàng hóa")
     return normalized
 
 
