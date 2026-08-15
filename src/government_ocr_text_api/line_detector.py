@@ -301,22 +301,22 @@ def _detect_column_split(
         crossing_ratio = len(crossing) / max(1, len(polygons))
 
         normal_columns = (
-            count_balance >= 0.16
-            and overlap_ratio >= 0.24
-            and crossing_ratio <= 0.24
-            and table_like_ratio < 0.30
+            count_balance >= 0.14
+            and overlap_ratio >= 0.20
+            and crossing_ratio <= 0.28
+            and table_like_ratio < 0.60
         )
         right_center = float(
             np.mean([(item.bbox.x0 + item.bbox.x1) / 2 for item in right])
         )
         signature_block = (
             signature_enabled
-            and len(left) >= 5
-            and 2 <= len(right) <= signature_max_right_lines
-            and right_center >= page_width * 0.58
-            and overlap_ratio >= 0.12
+            and len(left) >= 4
+            and 2 <= len(right) <= signature_max_right_lines + 2
+            and right_center >= page_width * 0.55
+            and overlap_ratio >= 0.10
             and crossing_ratio <= 0.35
-            and table_like_ratio < 0.30
+            and table_like_ratio < 0.60
         )
         if not normal_columns and not signature_block:
             continue

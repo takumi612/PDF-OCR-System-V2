@@ -16,6 +16,7 @@ from .line_crops import (
     make_axis_aligned_retry_crop,
     make_horizontal_expanded_line_crop,
     make_line_crop,
+    trim_checkbox_glyph_from_crop,
 )
 from .line_detector import PaddleLineDetector
 from .logging_utils import measure
@@ -52,12 +53,16 @@ def _is_incomplete_chapter_heading(
 
 
 
-def _nontext_crop_reason(crop: LineCrop, settings: Settings) -> str | None:
+def _nontext_crop_reason(
+    crop: LineCrop,
+    settings: Settings,
+    page_height: float | None = None,
+) -> str | None:
     """Return a geometry-only reason when a crop is unsafe to send to seq2seq OCR.
 
-    The filter is deliberately conservative: it only removes nearly blank crops
-    or very wide marks whose ink is confined to a thin horizontal band (rules /
-    dotted leaders). It never inspects recognized words or document vocabulary.
+    The filter is deliberately conservative: it only removes nearly blank crops,
+    footer handwritten noise, or very wide marks whose ink is confined to a
+    thin horizontal band (rules / dotted leaders).
     """
     if not settings.ocr_nontext_crop_filter_enabled:
         return None
@@ -71,6 +76,11 @@ def _nontext_crop_reason(crop: LineCrop, settings: Settings) -> str | None:
 
     height, width = ink.shape
     aspect_ratio = width / max(height, 1)
+
+    if page_height is not None and page_height > 0:
+        bbox = crop.polygon.bbox
+        if bbox.y0 >= page_height * 0.88 and width <= 130 and height <= 45:
+            return "footer_margin_noise"
     # A row counts as active only when it contains a non-trivial amount of ink.
     # This catches padded horizontal rules without relying on the crop's absolute
     # pixel height.
@@ -269,18 +279,20 @@ class OcrPagePipeline:
         metrics["layout_ordering"] = dict(getattr(self.detector, "last_metrics", {}))
         with measure(metrics, "line_crop_ms"):
             raw_crops = [
-                make_line_crop(
-                    page,
-                    polygon,
-                    self.settings.line_crop_padding_ratio,
-                    f"p{page_index:04d}-l{index:04d}",
+                trim_checkbox_glyph_from_crop(
+                    make_line_crop(
+                        page,
+                        polygon,
+                        self.settings.line_crop_padding_ratio,
+                        f"p{page_index:04d}-l{index:04d}",
+                    )
                 )
                 for index, polygon in enumerate(polygons)
             ]
             crops: list[LineCrop] = []
             filter_reasons: dict[str, int] = {}
             for crop in raw_crops:
-                reason = _nontext_crop_reason(crop, self.settings)
+                reason = _nontext_crop_reason(crop, self.settings, page.pixel_height)
                 if reason is None:
                     crops.append(crop)
                     continue

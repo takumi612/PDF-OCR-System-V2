@@ -374,22 +374,12 @@ def normalize_legal_collocations(value: str) -> str:
         r"(?<=sự tham gia của các )tố\b",
         "tổ",
     )
-    # Các quy tắc sửa lỗi pháp lý từ đối chiếu thực tế
-    normalized = _replace_with_case(normalized, r"\btỉnh thần\b", "tinh thần")
-    normalized = _replace_with_case(normalized, r"\bchỉ phí\b", "chi phí")
-    normalized = _replace_with_case(normalized, r"\bkinh tế tự nhân\b", "kinh tế tư nhân")
-    normalized = _replace_with_case(normalized, r"\bbất khả khảng\b", "bất khả kháng")
-    normalized = _replace_with_case(normalized, r"\bkiếm soát\b", "kiểm soát")
-    normalized = _replace_with_case(normalized, r"\btrí tuệ nhiệu nhân tạo\b", "trí tuệ nhân tạo")
-    normalized = _replace_with_case(normalized, r"\bxỏ(?=\s+các rào cản\b)", "xoá bỏ")
-    normalized = _replace_with_case(normalized, r"\bhỗ tượ\b", "hỗ trợ")
-    normalized = _replace_with_case(normalized, r"\bhỗ tạợ\b", "hỗ trợ")
-    normalized = _replace_with_case(normalized, r"\bChp nhật\b", "Cập nhật")
-    normalized = _replace_with_case(normalized, r"\bnghiệm định\b", "ổn định")
-    normalized = _replace_with_case(normalized, r"\bSửa di\b(?=\s+Luật)", "Sửa đổi")
-    normalized = _replace_with_case(normalized, r"\bmi quan hệ\b", "mối quan hệ")
-    normalized = _replace_with_case(normalized, r"\btrình đũ\b", "trình độ")
-    normalized = _replace_with_case(normalized, r"\bdẫn đình trạng\b", "dẫn đến tình trạng")
+    # Phục hồi lỗi biến dạng do ô tick / Checkbox glyph ở đầu dòng
+    normalized = _replace_with_case(normalized, r"^D\s*cị\s*hị\s*ch\s*vụ\b", "Dịch vụ")
+    normalized = _replace_with_case(normalized, r"^D\s*cị\s*vụ\b", "Dịch vụ")
+    normalized = _replace_with_case(normalized, r"^00\s+tô\b", "Ô tô")
+    normalized = _replace_with_case(normalized, r"^B\s+tất\s+động\s+sản\b", "Bất động sản")
+    normalized = _replace_with_case(normalized, r"^Hong\s+hóa\b", "Hàng hóa")
     return normalized
 
 
